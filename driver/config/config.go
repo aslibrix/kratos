@@ -171,6 +171,7 @@ const (
 	ViperKeySelfServiceVerificationNotifyUnknownRecipients   = "selfservice.flows.verification.notify_unknown_recipients"
 	ViperKeyDefaultIdentitySchemaID                          = "identity.default_schema_id"
 	ViperKeyIdentitySchemas                                  = "identity.schemas"
+	ViperKeyProjectIdentitySchemas                           = "identity.project_schemas"
 	ViperKeyHasherAlgorithm                                  = "hashers.algorithm"
 	ViperKeyHasherArgon2ConfigMemory                         = "hashers.argon2.memory"
 	ViperKeyHasherArgon2ConfigIterations                     = "hashers.argon2.iterations"
@@ -611,6 +612,14 @@ func (p *Config) DefaultIdentityTraitsSchemaURL(ctx context.Context) (*url.URL, 
 
 func (p *Config) DefaultIdentityTraitsSchemaID(ctx context.Context) string {
 	return p.GetProvider(ctx).String(ViperKeyDefaultIdentitySchemaID)
+}
+
+func (p *Config) IdentityTraitsSchemaIDForProject(ctx context.Context, projectID uuid.UUID) string {
+	m := p.GetProvider(ctx).StringMap(ViperKeyProjectIdentitySchemas)
+	if id, ok := m[projectID.String()]; ok {
+		return id
+	}
+	return p.DefaultIdentityTraitsSchemaID(ctx)
 }
 
 func (p *Config) TOTPIssuer(ctx context.Context) string {
