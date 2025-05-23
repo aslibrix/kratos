@@ -11,6 +11,8 @@ import (
 	"github.com/ory/kratos/x/nosurfx"
 	"github.com/ory/kratos/x/redir"
 
+	"github.com/gofrs/uuid"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel/attribute"
@@ -671,6 +673,13 @@ func (h *Handler) updateRegistrationFlow(w http.ResponseWriter, r *http.Request,
 	}
 
 	i := identity.NewIdentity(h.d.Config().DefaultIdentityTraitsSchemaID(r.Context()))
+
+	if pidHeader := r.Header.Get("project_id"); pidHeader != "" {
+		if projectUUID, err := uuid.FromString(pidHeader); err == nil {
+			i.ProjectID = uuid.NullUUID{UUID: projectUUID, Valid: true}
+			i.SchemaID = h.d.Config().IdentityTraitsSchemaIDForProject(r.Context(), projectUUID)
+		}
+	}
 	var s Strategy
 	for _, ss := range h.d.AllRegistrationStrategies() {
 		if err := ss.Register(w, r, f, i); errors.Is(err, flow.ErrStrategyNotResponsible) {

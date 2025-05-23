@@ -132,6 +132,7 @@ type Identity struct {
 	UpdatedAt      time.Time     `json:"updated_at" db:"updated_at"`
 	NID            uuid.UUID     `json:"-"  faker:"-" db:"nid"`
 	OrganizationID uuid.NullUUID `json:"organization_id,omitempty"  faker:"-" db:"organization_id"`
+	ProjectID      uuid.NullUUID `json:"project_id,omitempty" faker:"-" db:"project_id"`
 }
 
 func (i *Identity) PageToken() keysetpagination.PageToken {
